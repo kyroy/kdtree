@@ -8,18 +8,20 @@ import (
 	"github.com/kyroy/priority-queue"
 )
 
-// Point ...
+// Point specifies one element of the k-d tree.
 type Point interface {
+	// Dimensions returns the total number of dimensions
 	Dimensions() int
+	// Dimension returns the value of the i-th dimension
 	Dimension(i int) float64
 }
 
-// KDTree ...
+// KDTree represents the k-d tree.
 type KDTree struct {
 	root *node
 }
 
-// NewKDTree ...
+// NewKDTree returns an initialized k-d tree.
 func NewKDTree(points []Point) *KDTree {
 	return &KDTree{
 		root: newKDTree(points, 0),
@@ -45,7 +47,7 @@ func newKDTree(points []Point, axis int) *node {
 	}
 }
 
-// String ...
+// String returns a string representation of the k-d tree.
 func (t *KDTree) String() string {
 	return fmt.Sprintf("[%s]", printTreeNode(t.root))
 }
@@ -57,7 +59,7 @@ func printTreeNode(n *node) string {
 	return fmt.Sprintf("%s", n)
 }
 
-// Insert ...
+// Insert adds a point to the k-d tree.
 func (t *KDTree) Insert(p Point) {
 	if t.root == nil {
 		t.root = &node{Point: p}
@@ -71,7 +73,8 @@ func (t *KDTree) Insert(p Point) {
 //	// requires equals method? or based in Dim()?
 //}
 
-// Points ...
+// Points returns all points in the k-d tree.
+// The tree is traversed in-order.
 func (t *KDTree) Points() []Point {
 	if t.root == nil {
 		return []Point{}
@@ -79,7 +82,7 @@ func (t *KDTree) Points() []Point {
 	return t.root.Points()
 }
 
-// KNN ...
+// KNN returns the k-nearest neighbours of the given point.
 func (t *KDTree) KNN(p Point, k int) []Point {
 	if t.root == nil || p == nil || k == 0 {
 		return []Point{}
@@ -204,12 +207,10 @@ type node struct {
 	Right *node
 }
 
-// String ...
 func (n *node) String() string {
 	return fmt.Sprintf("%v", n.Point)
 }
 
-// Points ...
 func (n *node) Points() []Point {
 	var points []Point
 	if n.Left != nil {
@@ -222,7 +223,6 @@ func (n *node) Points() []Point {
 	return points
 }
 
-// Insert ...
 func (n *node) Insert(p Point, axis int) {
 	if p.Dimension(axis) < n.Point.Dimension(axis) {
 		if n.Left == nil {

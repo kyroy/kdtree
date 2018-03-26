@@ -87,8 +87,11 @@ func main() {
 ### Implement the `kdtree.Point` interface
 
 ```go
+// Point specifies one element of the k-d tree.
 type Point interface {
+	// Dimensions returns the total number of dimensions
 	Dimensions() int
+	// Dimension returns the value of the i-th dimension
 	Dimension(i int) float64
 }
 ```
