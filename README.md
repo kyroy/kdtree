@@ -1,8 +1,11 @@
 # kdtree
 
+[![Documentation](https://godoc.org/github.com/Kyroy/kdtree?status.svg)](http://godoc.org/github.com/Kyroy/kdtree)
 [![Build Status](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/badge/icon)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
 [![Jenkins tests](https://img.shields.io/jenkins/t/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
 [![Jenkins coverage](https://img.shields.io/jenkins/c/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kyroy/kdtree)](https://goreportcard.com/report/github.com/kyroy/kdtree)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Kyroy/kdtree/blob/master/LICENSE)
 
 A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in golang with:
 - n-dimensional points
@@ -25,6 +28,24 @@ go get github.com/kyroy/kdtree
 ```go
 import "github.com/kyroy/kdtree"
 ````
+
+
+
+
+### Implement the `kdtree.Point` interface
+
+```go
+// Point specifies one element of the k-d tree.
+type Point interface {
+	// Dimensions returns the total number of dimensions
+	Dimensions() int
+	// Dimension returns the value of the i-th dimension
+	Dimension(i int) float64
+}
+```
+
+
+### `points.Point2d`
 
 ```go
 type Data struct {
@@ -54,7 +75,7 @@ func main() {
 }
 ```
 
-### n-dimensional Points
+### n-dimensional Points (`points.Point`)
 ```go
 type Data struct {
 	value string
@@ -80,18 +101,5 @@ func main() {
 	// [[{[3 7 10] {second}} {[4 6 1] {third}} [{[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]]]
 	fmt.Println(tree.Points())
 	// [{[3 7 10] {second}} {[4 6 1] {third}} {[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]
-}
-```
-
-
-### Implement the `kdtree.Point` interface
-
-```go
-// Point specifies one element of the k-d tree.
-type Point interface {
-	// Dimensions returns the total number of dimensions
-	Dimensions() int
-	// Dimension returns the value of the i-th dimension
-	Dimension(i int) float64
 }
 ```

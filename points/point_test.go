@@ -7,6 +7,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewPoint(t *testing.T) {
+	tests := []struct {
+		name        string
+		coordinates []float64
+		data        interface{}
+	}{
+		{name: "nil nil", coordinates: nil, data: nil},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			p := points.NewPoint(test.coordinates, test.data)
+			assert.Equal(t, test.coordinates, p.Coordinates)
+			assert.Equal(t, test.data, p.Data)
+			assert.Equal(t, len(test.coordinates), p.Dimensions())
+			for i, v := range test.coordinates {
+				assert.Equal(t, v, p.Dimension(i))
+			}
+		})
+	}
+}
+
 func TestPoint_Dimensions(t *testing.T) {
 	tests := []struct {
 		name  string

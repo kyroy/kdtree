@@ -1,3 +1,4 @@
+// Package kdtree implements a k-d tree data structure.
 package kdtree
 
 import (
@@ -10,9 +11,9 @@ import (
 
 // Point specifies one element of the k-d tree.
 type Point interface {
-	// Dimensions returns the total number of dimensions
+	// Dimensions returns the total number of dimensions.
 	Dimensions() int
-	// Dimension returns the value of the i-th dimension
+	// Dimension returns the value of the i-th dimension.
 	Dimension(i int) float64
 }
 
