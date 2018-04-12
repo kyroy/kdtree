@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Dennis Kuhnert
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 // Package kdtree implements a k-d tree data structure.
 package kdtree
 
@@ -22,7 +38,7 @@ type KDTree struct {
 	root *node
 }
 
-// NewKDTree returns an initialized k-d tree.
+// NewKDTree returns a balanced k-d tree.
 func NewKDTree(points []Point) *KDTree {
 	return &KDTree{
 		root: newKDTree(points, 0),
@@ -30,7 +46,7 @@ func NewKDTree(points []Point) *KDTree {
 }
 
 func newKDTree(points []Point, axis int) *node {
-	if points == nil || len(points) == 0 {
+	if len(points) == 0 {
 		return nil
 	}
 	if len(points) == 1 {
@@ -69,10 +85,21 @@ func (t *KDTree) Insert(p Point) {
 	}
 }
 
-// Remove // TODO planned
-//func (t *KDTree) Remove(p Point) {
-//	// requires equals method? or based in Dim()?
-//}
+// Remove removes and returns the first point from the tree that equals the given point p in all dimensions.
+// Returns nil if not found.
+func (t *KDTree) Remove(p Point) interface{} {
+	if t.root == nil || p == nil {
+		return nil
+	}
+	n, sub := t.root.Remove(p, 0)
+	if n == t.root {
+		t.root = sub
+	}
+	if n == nil {
+		return nil
+	}
+	return n.Point
+}
 
 // Points returns all points in the k-d tree.
 // The tree is traversed in-order.
@@ -238,4 +265,86 @@ func (n *node) Insert(p Point, axis int) {
 			n.Right.Insert(p, (axis+1)%n.Point.Dimensions())
 		}
 	}
+}
+
+// Remove returns (returned node, substitute node)
+func (n *node) Remove(p Point, axis int) (*node, *node) {
+	for i := 0; i < n.Dimensions(); i++ {
+		if n.Dimension(i) != p.Dimension(i) {
+			if n.Left != nil {
+				returnedNode, substitutedNode := n.Left.Remove(p, (axis+1)%n.Dimensions())
+				if returnedNode != nil {
+					if returnedNode == n.Left {
+						n.Left = substitutedNode
+					}
+					return returnedNode, nil
+				}
+			}
+			if n.Right != nil {
+				returnedNode, substitutedNode := n.Right.Remove(p, (axis+1)%n.Dimensions())
+				if returnedNode != nil {
+					if returnedNode == n.Right {
+						n.Right = substitutedNode
+					}
+					return returnedNode, nil
+				}
+			}
+			return nil, nil
+		}
+	}
+
+	// equals, remove n
+
+	if n.Left != nil {
+		largest := n.Left.FindLargest(axis, nil)
+		removed, sub := n.Left.Remove(largest, axis)
+
+		removed.Left = n.Left
+		removed.Right = n.Right
+		if n.Left == removed {
+			removed.Left = sub
+		}
+		return n, removed
+	}
+
+	if n.Right != nil {
+		smallest := n.Right.FindSmallest(axis, nil)
+		removed, sub := n.Right.Remove(smallest, axis)
+
+		removed.Left = n.Left
+		removed.Right = n.Right
+		if n.Right == removed {
+			removed.Right = sub
+		}
+		return n, removed
+	}
+
+	// n.Left == nil && n.Right == nil
+	return n, nil
+}
+
+func (n *node) FindSmallest(axis int, smallest *node) *node {
+	if smallest == nil || n.Dimension(axis) < smallest.Dimension(axis) {
+		smallest = n
+	}
+	if n.Left != nil {
+		smallest = n.Left.FindSmallest(axis, smallest)
+	}
+	if n.Right != nil {
+		smallest = n.Right.FindSmallest(axis, smallest)
+	}
+	return smallest
+}
+
+func (n *node) FindLargest(axis int, largest *node) *node {
+	if largest == nil || n.Dimension(axis) > largest.Dimension(axis) {
+		largest = n
+	}
+	if n.Left != nil {
+		largest = n.Left.FindLargest(axis, largest)
+	}
+	if n.Right != nil {
+		largest = n.Right.FindLargest(axis, largest)
+	}
+	return largest
 }

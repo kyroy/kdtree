@@ -1,6 +1,6 @@
 # kdtree
 
-[![Documentation](https://godoc.org/github.com/Kyroy/kdtree?status.svg)](http://godoc.org/github.com/Kyroy/kdtree)
+[![GoDoc](https://godoc.org/github.com/Kyroy/kdtree?status.svg)](https://godoc.org/github.com/Kyroy/kdtree)
 [![Build Status](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/badge/icon)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
 [![Jenkins tests](https://img.shields.io/jenkins/t/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
 [![Jenkins coverage](https://img.shields.io/jenkins/c/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
@@ -10,13 +10,13 @@
 A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in golang with:
 - n-dimensional points
 - k-nearest neighbor search
+- remove without rebuilding the whole subtree
 - data attached to the points
-- using own structs by implementing a 2 function interface 
+- using own structs by implementing a simple 2 function interface 
 
 Future features:
 - range search
 - balancing
-- removing 
 
 
 ## Usage
@@ -28,7 +28,6 @@ go get github.com/kyroy/kdtree
 ```go
 import "github.com/kyroy/kdtree"
 ````
-
 
 
 
