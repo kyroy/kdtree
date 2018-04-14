@@ -16,7 +16,6 @@ A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in golang wi
 
 Future features:
 - range search
-- balancing
 
 
 ## Usage
@@ -81,24 +80,24 @@ type Data struct {
 }
 
 func main() {
-	tree := kdtree.NewKDTree([]kdtree.Point{
-		&points.Point{Coordinates: []float64{7, 2, 3}, Data: Data{value: "first"}},
-		&points.Point{Coordinates: []float64{3, 7, 10}, Data: Data{value: "second"}},
-		&points.Point{Coordinates: []float64{4, 6, 1}, Data: Data{value: "third"}},
-	})
-
-	// Insert
-	tree.Insert(&points.Point{Coordinates: []float64{12, 4, 6}, Data: Data{value: "fourth"}})
-	tree.Insert(&points.Point{Coordinates: []float64{8, 1, 0}, Data: Data{value: "fifth"}})
-
-	// KNN (k-nearest neighbor)
-	fmt.Println(tree.KNN(&points.Point{Coordinates: []float64{1, 1, 1}}, 2))
-	// [{[4 6 1] {third}} {[7 2 3] {first}}]
-
-	// other
-	fmt.Println(tree)
-	// [[{[3 7 10] {second}} {[4 6 1] {third}} [{[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]]]
-	fmt.Println(tree.Points())
-	// [{[3 7 10] {second}} {[4 6 1] {third}} {[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]
+    tree := kdtree.NewKDTree([]kdtree.Point{
+    points.NewPoint([]float64{7, 2, 3}, Data{value: "first"}),
+    points.NewPoint([]float64{3, 7, 10}, Data{value: "second"}),
+    points.NewPoint([]float64{4, 6, 1}, Data{value: "third"}),
+    })
+    
+    // Insert
+    tree.Insert(points.NewPoint([]float64{12, 4, 6}, Data{value: "fourth"}))
+    tree.Insert(points.NewPoint([]float64{8, 1, 0}, Data{value: "fifth"}))
+    
+    // KNN (k-nearest neighbor)
+    fmt.Println(tree.KNN(&points.Point{Coordinates: []float64{1, 1, 1}}, 2))
+    // [{[4 6 1] {third}} {[7 2 3] {first}}]
+    
+    // other
+    fmt.Println(tree)
+    // [[{[3 7 10] {second}} {[4 6 1] {third}} [{[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]]]
+    fmt.Println(tree.Points())
+    // [{[3 7 10] {second}} {[4 6 1] {third}} {[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]
 }
 ```

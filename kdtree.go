@@ -87,7 +87,7 @@ func (t *KDTree) Insert(p Point) {
 
 // Remove removes and returns the first point from the tree that equals the given point p in all dimensions.
 // Returns nil if not found.
-func (t *KDTree) Remove(p Point) interface{} {
+func (t *KDTree) Remove(p Point) Point {
 	if t.root == nil || p == nil {
 		return nil
 	}
@@ -99,6 +99,11 @@ func (t *KDTree) Remove(p Point) interface{} {
 		return nil
 	}
 	return n.Point
+}
+
+// Balance rebalances the k-d tree by recreating it.
+func (t *KDTree) Balance() {
+	t.root = newKDTree(t.Points(), 0)
 }
 
 // Points returns all points in the k-d tree.

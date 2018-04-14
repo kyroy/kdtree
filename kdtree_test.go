@@ -124,9 +124,9 @@ func TestInsertWithGenerator(t *testing.T) {
 		name  string
 		input []kdtree.Point
 	}{
-		{name: "p:10,k:5", input: generateLargeCaseData(10)},
-		{name: "p:100,k:5", input: generateLargeCaseData(100)},
-		{name: "p:1000,k:5", input: generateLargeCaseData(1000)},
+		{name: "p:10,k:5", input: generateTestCaseData(10)},
+		{name: "p:100,k:5", input: generateTestCaseData(100)},
+		{name: "p:1000,k:5", input: generateTestCaseData(1000)},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -295,6 +295,67 @@ func TestRemove(t *testing.T) {
 	}
 }
 
+func TestBalance(t *testing.T) {
+	tests := []struct {
+		name       string
+		treeInput  *kdtree.KDTree
+		preRemove  []kdtree.Point
+		treeOutput string
+	}{
+		{
+			name:       "empty tree",
+			treeInput:  kdtree.NewKDTree([]kdtree.Point{}),
+			treeOutput: "[<nil>]",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if test.preRemove != nil {
+				for _, r := range test.preRemove {
+					test.treeInput.Remove(r)
+				}
+			}
+			test.treeInput.Balance()
+			assert.Equal(t, test.treeOutput, test.treeInput.String())
+		})
+	}
+}
+
+func TestBalanceNoNilNode(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  []kdtree.Point
+		add    int
+		remove int
+	}{
+		// add
+		{name: "0->1", input: generateTestCaseData(0), add: 1},
+		{name: "0->3", input: generateTestCaseData(0), add: 3},
+		{name: "0->7", input: generateTestCaseData(0), add: 7},
+		{name: "0->15", input: generateTestCaseData(0), add: 15},
+		// remove
+		{name: "5->1", input: generateTestCaseData(5), remove: 4},
+		{name: "32->3", input: generateTestCaseData(32), remove: 29},
+		{name: "17->7", input: generateTestCaseData(17), remove: 10},
+		{name: "17->15", input: generateTestCaseData(17), remove: 2},
+		// remove & add
+		{name: "50->8->15", input: generateTestCaseData(50), remove: 42, add: 7},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tree := kdtree.NewKDTree(test.input)
+			for i := 0; i < test.remove; i++ {
+				tree.Remove(test.input[i])
+			}
+			for _, p := range generateTestCaseData(test.add) {
+				tree.Insert(p)
+			}
+			tree.Balance()
+			assert.NotContains(t, tree.String(), "<nil>")
+		})
+	}
+}
+
 // TestKNN ...
 func TestKNN(t *testing.T) {
 	tests := []struct {
@@ -348,13 +409,13 @@ func TestKNNWithGenerator(t *testing.T) {
 		k      int
 		input  []kdtree.Point
 	}{
-		{name: "p:100,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(100)},
-		{name: "p:1000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(1000)},
-		{name: "p:10000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(10000)},
-		{name: "p:100000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(100000)},
-		{name: "p:1000000,k:10", target: &Point2D{}, k: 10, input: generateLargeCaseData(1000000)},
-		{name: "p:1000000,k:20", target: &Point2D{}, k: 20, input: generateLargeCaseData(1000000)},
-		{name: "p:1000000,k:30", target: &Point2D{}, k: 30, input: generateLargeCaseData(1000000)},
+		{name: "p:100,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(100)},
+		{name: "p:1000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(1000)},
+		{name: "p:10000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(10000)},
+		{name: "p:100000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(100000)},
+		{name: "p:1000000,k:10", target: &Point2D{}, k: 10, input: generateTestCaseData(1000000)},
+		{name: "p:1000000,k:20", target: &Point2D{}, k: 20, input: generateTestCaseData(1000000)},
+		{name: "p:1000000,k:30", target: &Point2D{}, k: 30, input: generateTestCaseData(1000000)},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -375,10 +436,10 @@ func BenchmarkNewKDTree(b *testing.B) {
 		name  string
 		input []kdtree.Point
 	}{
-		{name: "100", input: generateLargeCaseData(100)},
-		{name: "1000", input: generateLargeCaseData(1000)},
-		{name: "10000", input: generateLargeCaseData(10000)},
-		{name: "100000", input: generateLargeCaseData(100000)},
+		{name: "100", input: generateTestCaseData(100)},
+		{name: "1000", input: generateTestCaseData(1000)},
+		{name: "10000", input: generateTestCaseData(10000)},
+		{name: "100000", input: generateTestCaseData(100000)},
 	}
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
@@ -399,10 +460,10 @@ func BenchmarkKNN(b *testing.B) {
 		k      int
 		input  []kdtree.Point
 	}{
-		{name: "p:100,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(100)},
-		{name: "p:1000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(1000)},
-		{name: "p:10000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(10000)},
-		{name: "p:100000,k:5", target: &Point2D{}, k: 5, input: generateLargeCaseData(100000)},
+		{name: "p:100,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(100)},
+		{name: "p:1000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(1000)},
+		{name: "p:10000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(10000)},
+		{name: "p:100000,k:5", target: &Point2D{}, k: 5, input: generateTestCaseData(100000)},
 	}
 	for _, bm := range benchmarks {
 		var res []kdtree.Point
@@ -418,7 +479,7 @@ func BenchmarkKNN(b *testing.B) {
 
 // helpers
 
-func generateLargeCaseData(size int) []kdtree.Point {
+func generateTestCaseData(size int) []kdtree.Point {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var points []kdtree.Point
 	for i := 0; i < size; i++ {
