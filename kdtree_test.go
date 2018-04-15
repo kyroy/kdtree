@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewKDTree(t *testing.T) {
+func TestNew(t *testing.T) {
 	tests := []struct {
 		name   string
 		input  []kdtree.Point
@@ -62,7 +62,7 @@ func TestNewKDTree(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTree(test.input)
+			tree := kdtree.New(test.input)
 			assert.Equal(t, test.output, tree.Points())
 		})
 
@@ -76,9 +76,9 @@ func TestString(t *testing.T) {
 		expected string
 	}{
 		{name: "empty", tree: &kdtree.KDTree{}, expected: "[<nil>]"},
-		{name: "1 elem", tree: kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 2, Y: 3}}), expected: "[{2.00 3.00}]"},
-		{name: "2 elem", tree: kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 2, Y: 3}, &Point2D{X: 3.4, Y: 1}}), expected: "[[{2.00 3.00} {3.40 1.00} <nil>]]"},
-		{name: "3 elem", tree: kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 2, Y: 3}, &Point2D{X: 1.4, Y: 7.1}, &Point2D{X: 3.4, Y: 1}}), expected: "[[{1.40 7.10} {2.00 3.00} {3.40 1.00}]]"},
+		{name: "1 elem", tree: kdtree.New([]kdtree.Point{&Point2D{X: 2, Y: 3}}), expected: "[{2.00 3.00}]"},
+		{name: "2 elem", tree: kdtree.New([]kdtree.Point{&Point2D{X: 2, Y: 3}, &Point2D{X: 3.4, Y: 1}}), expected: "[[{2.00 3.00} {3.40 1.00} <nil>]]"},
+		{name: "3 elem", tree: kdtree.New([]kdtree.Point{&Point2D{X: 2, Y: 3}, &Point2D{X: 1.4, Y: 7.1}, &Point2D{X: 3.4, Y: 1}}), expected: "[[{1.40 7.10} {2.00 3.00} {3.40 1.00}]]"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -101,7 +101,7 @@ func TestInsert(t *testing.T) {
 		},
 		{
 			name:      "1 dim",
-			treeInput: kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
+			treeInput: kdtree.New([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
 			input:     []kdtree.Point{&Point2D{X: 0.9, Y: 2.1}},
 			output:    []kdtree.Point{&Point2D{X: 0.9, Y: 2.1}, &Point2D{X: 1., Y: 2.}},
 		},
@@ -109,7 +109,7 @@ func TestInsert(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			if test.treeInput == nil {
-				test.treeInput = kdtree.NewKDTree(nil)
+				test.treeInput = kdtree.New(nil)
 			}
 			for _, elem := range test.input {
 				test.treeInput.Insert(elem)
@@ -130,7 +130,7 @@ func TestInsertWithGenerator(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTree(nil)
+			tree := kdtree.New(nil)
 			for _, elem := range test.input {
 				tree.Insert(elem)
 				_ = tree.Points()
@@ -152,28 +152,28 @@ func TestRemove(t *testing.T) {
 	}{
 		{
 			name:       "empty tree",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{}),
+			treeInput:  kdtree.New([]kdtree.Point{}),
 			input:      &Point2D{},
 			treeOutput: "[<nil>]",
 			output:     nil,
 		},
 		{
 			name:       "nil input",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
 			input:      nil,
 			treeOutput: "[{1.00 2.00}]",
 			output:     nil,
 		},
 		{
 			name:       "remove root",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1., Y: 2.}}),
 			input:      &Point2D{X: 1., Y: 2.},
 			treeOutput: "[<nil>]",
 			output:     &Point2D{X: 1., Y: 2.},
 		},
 		{
 			name:       "remove root with children",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1., Y: 2.}, &Point2D{X: 1.2, Y: 2.2}, &Point2D{X: 1.3, Y: 2.3}, &Point2D{X: 1.1, Y: 2.1}, &Point2D{X: -1.3, Y: -2.2}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1., Y: 2.}, &Point2D{X: 1.2, Y: 2.2}, &Point2D{X: 1.3, Y: 2.3}, &Point2D{X: 1.1, Y: 2.1}, &Point2D{X: -1.3, Y: -2.2}}),
 			input:      &Point2D{X: 1.1, Y: 2.1},
 			treeOutput: "[[{-1.30 -2.20} {1.00 2.00} [{1.20 2.20} {1.30 2.30} <nil>]]]",
 			output:     &Point2D{X: 1.1, Y: 2.1},
@@ -185,35 +185,35 @@ func TestRemove(t *testing.T) {
 		// [[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]
 		{
 			name:       "not existing",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 1., Y: 1.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
 			output:     nil,
 		},
 		{
 			name:       "remove leaf",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 8., Y: 5.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} <nil>] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
 			output:     &Point2D{X: 8., Y: 5.},
 		},
 		{
 			name:       "remove leaf",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 6., Y: 8.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} {9.00 9.00}]]]",
 			output:     &Point2D{X: 6., Y: 8.},
 		},
 		{
 			name:       "remove with 1 replace, right child nil",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 9., Y: 9.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} {6.00 8.00}]]]",
 			output:     &Point2D{X: 9., Y: 9.},
 		},
 		{
 			name:       "remove with 1 replace, left child nil",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			preRemove:  []kdtree.Point{&Point2D{X: 1, Y: 3}},
 			input:      &Point2D{X: 2., Y: 2.},
 			treeOutput: "[[[{4.00 1.00} {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
@@ -221,28 +221,28 @@ func TestRemove(t *testing.T) {
 		},
 		{
 			name:       "remove with 1 replace",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 8., Y: 2.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[<nil> {7.00 4.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
 			output:     &Point2D{X: 8., Y: 2.},
 		},
 		{
 			name:       "remove with 1 replace, deep",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 3., Y: 6.},
 			treeOutput: "[[[[<nil> {2.00 2.00} {4.00 1.00}] {1.00 3.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
 			output:     &Point2D{X: 3., Y: 6.},
 		},
 		{
 			name:       "remove with 1 replace, deep",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			input:      &Point2D{X: 7., Y: 7.},
 			treeOutput: "[[[[{1.00 3.00} {2.00 2.00} {4.00 1.00}] {3.00 6.00} [{1.00 8.00} {2.00 10.00} <nil>]] {5.00 4.00} [[{7.00 4.00} {8.00 2.00} <nil>] {8.00 5.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
 			output:     &Point2D{X: 7., Y: 7.},
 		},
 		{
 			name:       "remove with left nil",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			preRemove:  []kdtree.Point{&Point2D{X: 4, Y: 1}, &Point2D{X: 1, Y: 3}, &Point2D{X: 2, Y: 2}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}},
 			input:      &Point2D{X: 5., Y: 4.},
 			treeOutput: "[[<nil> {6.00 8.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} {9.00 9.00}]]]",
@@ -250,7 +250,7 @@ func TestRemove(t *testing.T) {
 		},
 		{
 			name:       "remove with sub left nil",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}}),
 			preRemove:  []kdtree.Point{&Point2D{X: 4, Y: 1}, &Point2D{X: 1, Y: 3}, &Point2D{X: 2, Y: 2}},
 			input:      &Point2D{X: 5., Y: 4.},
 			treeOutput: "[[[<nil> {1.00 8.00} {2.00 10.00}] {3.00 6.00} [[{7.00 4.00} {8.00 2.00} {8.00 5.00}] {7.00 7.00} [{6.00 8.00} {9.00 9.00} <nil>]]]]",
@@ -264,14 +264,14 @@ func TestRemove(t *testing.T) {
 		// [[[[[{2.00 1.00} {2.00 2.00} {1.00 3.00}] {3.00 1.00} [{3.00 1.00} {4.00 2.00} {3.00 3.00}]] {1.00 3.00} [[{1.00 8.00} {2.00 8.00} {2.00 10.00}] {3.00 6.00} [{4.00 4.00} {3.00 8.00} {3.00 9.00}]]] {4.00 1.00} [[[{6.00 2.00} {5.00 3.00} {6.00 4.00}] {7.00 3.00} [{8.00 2.00} {9.00 2.00} {7.00 4.00}]] {5.00 4.00} [[{6.00 5.00} {7.00 7.00} {6.00 8.00}] {8.00 5.00} [{9.00 6.00} {9.00 8.00} {9.00 9.00}]]]]]
 		{
 			name:       "remove (3,1) with 2 replace",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
 			input:      &Point2D{X: 3., Y: 1.},
 			treeOutput: "[[[[[<nil> {2.00 1.00} {1.00 3.00}] {2.00 2.00} [{3.00 1.00} {4.00 2.00} {3.00 3.00}]] {1.00 3.00} [[{1.00 8.00} {2.00 8.00} {2.00 10.00}] {3.00 6.00} [{4.00 4.00} {3.00 8.00} {3.00 9.00}]]] {4.00 1.00} [[[{6.00 2.00} {5.00 3.00} {6.00 4.00}] {7.00 3.00} [{8.00 2.00} {9.00 2.00} {7.00 4.00}]] {5.00 4.00} [[{6.00 5.00} {7.00 7.00} {6.00 8.00}] {8.00 5.00} [{9.00 6.00} {9.00 8.00} {9.00 9.00}]]]]]",
 			output:     &Point2D{X: 3., Y: 1.},
 		},
 		{
 			name:       "remove (5,4) with 1 replace, deep 3",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			treeInput:  kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
 			input:      &Point2D{X: 5., Y: 4.},
 			treeOutput: "[[[[[{2.00 1.00} {2.00 2.00} {1.00 3.00}] {3.00 1.00} [{3.00 1.00} {4.00 2.00} {3.00 3.00}]] {1.00 3.00} [[{1.00 8.00} {2.00 8.00} {2.00 10.00}] {3.00 6.00} [{4.00 4.00} {3.00 8.00} {3.00 9.00}]]] {4.00 1.00} [[[{6.00 2.00} {5.00 3.00} <nil>] {7.00 3.00} [{8.00 2.00} {9.00 2.00} {7.00 4.00}]] {6.00 4.00} [[{6.00 5.00} {7.00 7.00} {6.00 8.00}] {8.00 5.00} [{9.00 6.00} {9.00 8.00} {9.00 9.00}]]]]]",
 			output:     &Point2D{X: 5., Y: 4.},
@@ -304,7 +304,7 @@ func TestBalance(t *testing.T) {
 	}{
 		{
 			name:       "empty tree",
-			treeInput:  kdtree.NewKDTree([]kdtree.Point{}),
+			treeInput:  kdtree.New([]kdtree.Point{}),
 			treeOutput: "[<nil>]",
 		},
 	}
@@ -343,7 +343,7 @@ func TestBalanceNoNilNode(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTree(test.input)
+			tree := kdtree.New(test.input)
 			for i := 0; i < test.remove; i++ {
 				tree.Remove(test.input[i])
 			}
@@ -396,7 +396,7 @@ func TestKNN(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTree(test.input)
+			tree := kdtree.New(test.input)
 			assert.Equal(t, test.output, tree.KNN(test.target, test.k))
 		})
 	}
@@ -419,7 +419,7 @@ func TestKNNWithGenerator(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTree(test.input)
+			tree := kdtree.New(test.input)
 			assert.Equal(t, prioQueueKNN(test.input, test.target, test.k), tree.KNN(test.target, test.k))
 		})
 	}
@@ -430,8 +430,8 @@ func TestKNNWithGenerator(t *testing.T) {
 var resultTree *kdtree.KDTree
 var resultPoints []kdtree.Point
 
-// BenchmarkNewKDTree ...
-func BenchmarkNewKDTree(b *testing.B) {
+// BenchmarkNew ...
+func BenchmarkNew(b *testing.B) {
 	benchmarks := []struct {
 		name  string
 		input []kdtree.Point
@@ -445,7 +445,7 @@ func BenchmarkNewKDTree(b *testing.B) {
 		b.Run(bm.name, func(b *testing.B) {
 			var t *kdtree.KDTree
 			for i := 0; i < b.N; i++ {
-				t = kdtree.NewKDTree(bm.input)
+				t = kdtree.New(bm.input)
 			}
 			resultTree = t
 		})
@@ -467,7 +467,7 @@ func BenchmarkKNN(b *testing.B) {
 	}
 	for _, bm := range benchmarks {
 		var res []kdtree.Point
-		tree := kdtree.NewKDTree(bm.input)
+		tree := kdtree.New(bm.input)
 		b.Run(bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				res = tree.KNN(bm.target, bm.k)

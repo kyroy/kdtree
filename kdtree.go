@@ -38,8 +38,8 @@ type KDTree struct {
 	root *node
 }
 
-// NewKDTree returns a balanced k-d tree.
-func NewKDTree(points []Point) *KDTree {
+// New returns a balanced k-d tree.
+func New(points []Point) *KDTree {
 	return &KDTree{
 		root: newKDTree(points, 0),
 	}

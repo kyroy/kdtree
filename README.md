@@ -7,7 +7,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/kyroy/kdtree)](https://goreportcard.com/report/github.com/kyroy/kdtree)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Kyroy/kdtree/blob/master/LICENSE)
 
-A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in golang with:
+A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in Go with:
 - n-dimensional points
 - k-nearest neighbor search
 - remove without rebuilding the whole subtree
@@ -51,7 +51,7 @@ type Data struct {
 }
 
 func main() {
-	tree := kdtree.NewKDTree([]kdtree.Point{
+	tree := kdtree.New([]kdtree.Point{
 		&points.Point2D{X: 3, Y: 1},
 		&points.Point2D{X: 5, Y: 0},
 		&points.Point2D{X: 8, Y: 3},
@@ -80,7 +80,7 @@ type Data struct {
 }
 
 func main() {
-    tree := kdtree.NewKDTree([]kdtree.Point{
+    tree := kdtree.New([]kdtree.Point{
     points.NewPoint([]float64{7, 2, 3}, Data{value: "first"}),
     points.NewPoint([]float64{3, 7, 10}, Data{value: "second"}),
     points.NewPoint([]float64{4, 6, 1}, Data{value: "third"}),
