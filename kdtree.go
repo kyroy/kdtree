@@ -22,6 +22,7 @@ import (
 	"math"
 	"sort"
 
+	"github.com/kyroy/kdtree/kdrange"
 	"github.com/kyroy/priority-queue"
 )
 
@@ -116,6 +117,7 @@ func (t *KDTree) Points() []Point {
 }
 
 // KNN returns the k-nearest neighbours of the given point.
+// The points are sorted by the distance to the given points. Starting with the nearest.
 func (t *KDTree) KNN(p Point, k int) []Point {
 	if t.root == nil || p == nil || k == 0 {
 		return []Point{}
@@ -133,10 +135,22 @@ func (t *KDTree) KNN(p Point, k int) []Point {
 	return points
 }
 
+// RangeSearch returns all points in the given range r.
+//
+// Returns an empty slice when input is nil or len(r) does not equal Point.Dimensions().
+func (t *KDTree) RangeSearch(r kdrange.Range) []Point {
+	if t.root == nil || r == nil || len(r) != t.root.Dimensions() {
+		return []Point{}
+	}
+
+	return t.root.RangeSearch(r, 0)
+}
+
 func knn(p Point, k int, start *node, currentAxis int, nearestPQ *pq.PriorityQueue) {
 	if p == nil || k == 0 || start == nil {
 		return
 	}
+
 	var path []*node
 	currentNode := start
 
@@ -352,4 +366,25 @@ func (n *node) FindLargest(axis int, largest *node) *node {
 		largest = n.Right.FindLargest(axis, largest)
 	}
 	return largest
+}
+
+func (n *node) RangeSearch(r kdrange.Range, axis int) []Point {
+	points := []Point{}
+
+	for dim, limit := range r {
+		if limit[0] > n.Dimension(dim) || limit[1] < n.Dimension(dim) {
+			goto checkChildren
+		}
+	}
+	points = append(points, n.Point)
+
+checkChildren:
+	if n.Left != nil && n.Dimension(axis) >= r[axis][0] {
+		points = append(points, n.Left.RangeSearch(r, (axis+1)%n.Dimensions())...)
+	}
+	if n.Right != nil && n.Dimension(axis) <= r[axis][1] {
+		points = append(points, n.Right.RangeSearch(r, (axis+1)%n.Dimensions())...)
+	}
+
+	return points
 }

@@ -10,12 +10,10 @@
 A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in Go with:
 - n-dimensional points
 - k-nearest neighbor search
+- range search
 - remove without rebuilding the whole subtree
 - data attached to the points
 - using own structs by implementing a simple 2 function interface 
-
-Future features:
-- range search
 
 
 ## Usage
@@ -27,7 +25,6 @@ go get github.com/kyroy/kdtree
 ```go
 import "github.com/kyroy/kdtree"
 ````
-
 
 
 ### Implement the `kdtree.Point` interface
@@ -64,12 +61,27 @@ func main() {
 	// KNN (k-nearest neighbor)
 	fmt.Println(tree.KNN(&points.Point{Coordinates: []float64{1, 1, 1}}, 2))
 	// [{3.00 1.00} {5.00 0.00}]
-
-	// other
-	fmt.Println(tree)
-	// [[[<nil> {3.00 1.00} {1.00 8.00}] {5.00 0.00} [<nil> {8.00 3.00} {7.00 5.00}]]]
+	
+	// RangeSearch
+	fmt.Println(tree.RangeSearch(kdrange.New(1, 8, 0, 2)))
+	// [{5.00 0.00} {3.00 1.00}]
+    
+	// Points
 	fmt.Println(tree.Points())
 	// [{3.00 1.00} {1.00 8.00} {5.00 0.00} {8.00 3.00} {7.00 5.00}]
+
+	// Remove
+	fmt.Println(tree.Remove(&points.Point2D{X: 5, Y: 0}))
+	// {5.00 0.00}
+
+	// String
+	fmt.Println(tree)
+	// [[{1.00 8.00} {3.00 1.00} [<nil> {8.00 3.00} {7.00 5.00}]]]
+
+	// Balance
+	tree.Balance()
+	fmt.Println(tree)
+	// [[[{3.00 1.00} {1.00 8.00} <nil>] {7.00 5.00} {8.00 3.00}]]
 }
 ```
 
@@ -81,9 +93,9 @@ type Data struct {
 
 func main() {
     tree := kdtree.New([]kdtree.Point{
-    points.NewPoint([]float64{7, 2, 3}, Data{value: "first"}),
-    points.NewPoint([]float64{3, 7, 10}, Data{value: "second"}),
-    points.NewPoint([]float64{4, 6, 1}, Data{value: "third"}),
+        points.NewPoint([]float64{7, 2, 3}, Data{value: "first"}),
+        points.NewPoint([]float64{3, 7, 10}, Data{value: "second"}),
+        points.NewPoint([]float64{4, 6, 1}, Data{value: "third"}),
     })
     
     // Insert
@@ -94,10 +106,25 @@ func main() {
     fmt.Println(tree.KNN(&points.Point{Coordinates: []float64{1, 1, 1}}, 2))
     // [{[4 6 1] {third}} {[7 2 3] {first}}]
     
-    // other
-    fmt.Println(tree)
-    // [[{[3 7 10] {second}} {[4 6 1] {third}} [{[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]]]
+    // RangeSearch
+    fmt.Println(tree.RangeSearch(kdrange.New(1, 15, 1, 5, 0, 5)))
+    // [{[7 2 3] {first}} {[8 1 0] {fifth}}]
+    
+    // Points
     fmt.Println(tree.Points())
     // [{[3 7 10] {second}} {[4 6 1] {third}} {[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]
+
+    // Remove
+    fmt.Println(tree.Remove(points.NewPoint([]float64{3, 7, 10}, nil)))
+    // {[3 7 10] {second}}
+
+    // String
+    fmt.Println(tree)
+    // [[<nil> {[4 6 1] {third}} [{[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]]]
+
+    // Balance
+    tree.Balance()
+    fmt.Println(tree)
+    // [[[{[7 2 3] {first}} {[4 6 1] {third}} <nil>] {[8 1 0] {fifth}} {[12 4 6] {fourth}}]]
 }
 ```

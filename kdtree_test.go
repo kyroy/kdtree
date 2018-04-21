@@ -24,6 +24,7 @@ import (
 
 	"github.com/jupp0r/go-priority-queue"
 	"github.com/kyroy/kdtree"
+	"github.com/kyroy/kdtree/kdrange"
 	. "github.com/kyroy/kdtree/points"
 	"github.com/stretchr/testify/assert"
 )
@@ -69,7 +70,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestString(t *testing.T) {
+func TestKDTree_String(t *testing.T) {
 	tests := []struct {
 		name     string
 		tree     *kdtree.KDTree
@@ -87,7 +88,7 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func TestKDTree_Insert(t *testing.T) {
 	tests := []struct {
 		name      string
 		treeInput *kdtree.KDTree
@@ -119,7 +120,7 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-func TestInsertWithGenerator(t *testing.T) {
+func TestKDTree_InsertWithGenerator(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []kdtree.Point
@@ -141,7 +142,7 @@ func TestInsertWithGenerator(t *testing.T) {
 	}
 }
 
-func TestRemove(t *testing.T) {
+func TestKDTree_Remove(t *testing.T) {
 	tests := []struct {
 		name       string
 		treeInput  *kdtree.KDTree
@@ -295,7 +296,7 @@ func TestRemove(t *testing.T) {
 	}
 }
 
-func TestBalance(t *testing.T) {
+func TestKDTree_Balance(t *testing.T) {
 	tests := []struct {
 		name       string
 		treeInput  *kdtree.KDTree
@@ -321,7 +322,7 @@ func TestBalance(t *testing.T) {
 	}
 }
 
-func TestBalanceNoNilNode(t *testing.T) {
+func TestKDTree_BalanceNoNilNode(t *testing.T) {
 	tests := []struct {
 		name   string
 		input  []kdtree.Point
@@ -357,7 +358,7 @@ func TestBalanceNoNilNode(t *testing.T) {
 }
 
 // TestKNN ...
-func TestKNN(t *testing.T) {
+func TestKDTree_KNN(t *testing.T) {
 	tests := []struct {
 		name   string
 		target kdtree.Point
@@ -402,7 +403,7 @@ func TestKNN(t *testing.T) {
 	}
 }
 
-func TestKNNWithGenerator(t *testing.T) {
+func TestKDTree_KNNWithGenerator(t *testing.T) {
 	tests := []struct {
 		name   string
 		target kdtree.Point
@@ -425,12 +426,82 @@ func TestKNNWithGenerator(t *testing.T) {
 	}
 }
 
+func TestKDTree_RangeSearch(t *testing.T) {
+	tests := []struct {
+		name     string
+		tree     *kdtree.KDTree
+		input    kdrange.Range
+		expected []kdtree.Point
+	}{
+		{
+			name:     "nil",
+			tree:     kdtree.New(generateTestCaseData(5)),
+			input:    nil,
+			expected: []kdtree.Point{},
+		},
+		{
+			name:     "wrong dim",
+			tree:     kdtree.New(generateTestCaseData(5)),
+			input:    kdrange.New(),
+			expected: []kdtree.Point{},
+		},
+		{
+			name:     "out of range x (lower)",
+			tree:     kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			input:    kdrange.New(-2, -1, 2, 10),
+			expected: []kdtree.Point{},
+		},
+		{
+			name:     "out of range y (lower)",
+			tree:     kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			input:    kdrange.New(2, 10, -2, -1),
+			expected: []kdtree.Point{},
+		},
+		{
+			name:     "out of range x (higher)",
+			tree:     kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			input:    kdrange.New(20, 30, 2, 10),
+			expected: []kdtree.Point{},
+		},
+		{
+			name:     "out of range y (higher)",
+			tree:     kdtree.New([]kdtree.Point{&Point2D{X: 1, Y: 3}, &Point2D{X: 1, Y: 8}, &Point2D{X: 2, Y: 2}, &Point2D{X: 2, Y: 10}, &Point2D{X: 3, Y: 6}, &Point2D{X: 4, Y: 1}, &Point2D{X: 5, Y: 4}, &Point2D{X: 6, Y: 8}, &Point2D{X: 7, Y: 4}, &Point2D{X: 7, Y: 7}, &Point2D{X: 8, Y: 2}, &Point2D{X: 8, Y: 5}, &Point2D{X: 9, Y: 9}, &Point2D{X: 3, Y: 1}, &Point2D{X: 4, Y: 2}, &Point2D{X: 9, Y: 2}, &Point2D{X: 6, Y: 5}, &Point2D{X: 3, Y: 8}, &Point2D{X: 6, Y: 2}, &Point2D{X: 1, Y: 3}, &Point2D{X: 3, Y: 3}, &Point2D{X: 6, Y: 4}, &Point2D{X: 9, Y: 8}, &Point2D{X: 2, Y: 1}, &Point2D{X: 2, Y: 8}, &Point2D{X: 3, Y: 1}, &Point2D{X: 7, Y: 3}, &Point2D{X: 3, Y: 9}, &Point2D{X: 4, Y: 4}, &Point2D{X: 5, Y: 3}, &Point2D{X: 9, Y: 6}}),
+			input:    kdrange.New(2, 10, 20, 30),
+			expected: []kdtree.Point{},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, test.tree.RangeSearch(test.input))
+		})
+	}
+}
+
+func TestKDTree_RangeSearchWithGenerator(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []kdtree.Point
+		r     kdrange.Range
+	}{
+		{name: "nodes: 100 range: -100 50 -50 100", input: generateTestCaseData(100), r: kdrange.New(-100, 50, -50, 100)},
+		{name: "nodes: 1000 range: -100 50 -50 100", input: generateTestCaseData(1000), r: kdrange.New(-100, 50, -50, 100)},
+		{name: "nodes: 10000 range: -100 50 -50 100", input: generateTestCaseData(10000), r: kdrange.New(-100, 50, -50, 100)},
+		{name: "nodes: 100000 range: -500 250 -250 500", input: generateTestCaseData(100000), r: kdrange.New(-500, 250, -250, 500)},
+		{name: "nodes: 1000000 range: -500 250 -250 500", input: generateTestCaseData(1000000), r: kdrange.New(-500, 250, -250, 500)},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tree := kdtree.New(test.input)
+			assert.ElementsMatch(t, filterRangeSearch(test.input, test.r), tree.RangeSearch(test.r))
+		})
+	}
+}
+
 // benchmarks
 
 var resultTree *kdtree.KDTree
 var resultPoints []kdtree.Point
 
-// BenchmarkNew ...
 func BenchmarkNew(b *testing.B) {
 	benchmarks := []struct {
 		name  string
@@ -452,7 +523,6 @@ func BenchmarkNew(b *testing.B) {
 	}
 }
 
-// BenchmarkKNN ...
 func BenchmarkKNN(b *testing.B) {
 	benchmarks := []struct {
 		name   string
@@ -508,6 +578,22 @@ func prioQueueKNN(points []kdtree.Point, p kdtree.Point, k int) []kdtree.Point {
 		knn = append(knn, point.(kdtree.Point))
 	}
 	return knn
+}
+
+func filterRangeSearch(points []kdtree.Point, r kdrange.Range) []kdtree.Point {
+	result := make([]kdtree.Point, 0)
+
+pointLoop:
+	for _, point := range points {
+		for i, d := range r {
+			if d[0] > point.Dimension(i) || d[1] < point.Dimension(i) {
+				continue pointLoop
+			}
+		}
+		result = append(result, point)
+	}
+
+	return result
 }
 
 func distance(p1, p2 kdtree.Point) float64 {
