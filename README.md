@@ -1,11 +1,10 @@
 # kdtree
 
-[![GoDoc](https://godoc.org/github.com/Kyroy/kdtree?status.svg)](https://godoc.org/github.com/Kyroy/kdtree)
-[![Build Status](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/badge/icon)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
-[![Jenkins tests](https://img.shields.io/jenkins/t/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
-[![Jenkins coverage](https://img.shields.io/jenkins/c/https/jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master.svg)](https://jenkins.kyroy.com/job/github.com-kyroy/job/kdtree/job/master/)
+[![GoDoc](https://godoc.org/github.com/kyroy/kdtree?status.svg)](https://godoc.org/github.com/kyroy/kdtree)
+[![Build Status](https://travis-ci.org/kyroy/kdtree.svg?branch=master)](https://travis-ci.org/kyroy/kdtree)
+[![Codecov](https://img.shields.io/codecov/c/github/kyroy/kdtree.svg)](https://codecov.io/gh/kyroy/kdtree)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kyroy/kdtree)](https://goreportcard.com/report/github.com/kyroy/kdtree)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Kyroy/kdtree/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/kyroy/kdtree/blob/master/LICENSE)
 
 A [k-d tree](https://en.wikipedia.org/wiki/K-d_tree) implementation in Go with:
 - n-dimensional points
