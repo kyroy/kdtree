@@ -14,12 +14,11 @@
  *    limitations under the License.
  */
 
-package kdrange_test
+package kdtree
 
 import (
 	"testing"
 
-	"github.com/kyroy/kdtree/kdrange"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +26,7 @@ func TestNewRange(t *testing.T) {
 	tests := []struct {
 		name   string
 		input  []float64
-		output kdrange.Range
+		output kdrangeRange
 	}{
 		{
 			name:   "nil",
@@ -57,7 +56,7 @@ func TestNewRange(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.output, kdrange.New(test.input...))
+			assert.Equal(t, test.output, NewKDRange(test.input...))
 		})
 	}
 }

@@ -22,7 +22,6 @@ import (
 	"math"
 	"sort"
 
-	"github.com/kyroy/kdtree/kdrange"
 	"github.com/kyroy/priority-queue"
 )
 
@@ -142,7 +141,7 @@ func (t *KDTree) KNN(p Point, k int) []Point {
 // RangeSearch returns all points in the given range r.
 //
 // Returns an empty slice when input is nil or len(r) does not equal Point.Dimensions().
-func (t *KDTree) RangeSearch(r kdrange.Range) []Point {
+func (t *KDTree) RangeSearch(r kdrangeRange) []Point {
 	if t.root == nil || r == nil || len(r) != t.root.Dimensions() {
 		return []Point{}
 	}
@@ -360,7 +359,7 @@ func (n *node) FindLargest(axis int, largest *node) *node {
 	return largest
 }
 
-func (n *node) RangeSearch(r kdrange.Range, axis int) []Point {
+func (n *node) RangeSearch(r kdrangeRange, axis int) []Point {
 	points := []Point{}
 
 	for dim, limit := range r {
