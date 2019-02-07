@@ -14,13 +14,12 @@
  *    limitations under the License.
  */
 
-// Package kdrange contains k-dimensional range struct and helpers.
-package kdrange
+package kdtree
 
-// Range represents a range in k-dimensional space.
-type Range [][2]float64
+// kdrangeRange represents a range in k-dimensional space.
+type kdrangeRange [][2]float64
 
-// New creates a new Range.
+// NewKDRange creates a new Range.
 //
 // It accepts a sequence of min/max pairs that define the Range.
 // For example a 2-dimensional rectangle with the with 2 and height 3, starting at (1,2):
@@ -30,7 +29,7 @@ type Range [][2]float64
 // I.e.:
 //     x (dim 0): 1 <= x <= 3
 //     y (dim 1): 2 <= y <= 5
-func New(limits ...float64) Range {
+func NewKDRange(limits ...float64) kdrangeRange {
 	if limits == nil || len(limits)%2 != 0 {
 		return nil
 	}

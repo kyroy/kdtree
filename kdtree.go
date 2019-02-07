@@ -22,7 +22,6 @@ import (
 	"math"
 	"sort"
 
-	"github.com/kyroy/kdtree/kdrange"
 	"github.com/kyroy/priority-queue"
 )
 
@@ -32,6 +31,10 @@ type Point interface {
 	Dimensions() int
 	// Dimension returns the value of the i-th dimension.
 	Dimension(i int) float64
+	// Distance returns the distance between two points.
+	Distance(p Point) float64
+	// PlaneDistance returns the distance between the point and the plane X_{dim}=val.
+	PlaneDistance(val float64, dim int) float64
 }
 
 // KDTree represents the k-d tree.
@@ -138,7 +141,7 @@ func (t *KDTree) KNN(p Point, k int) []Point {
 // RangeSearch returns all points in the given range r.
 //
 // Returns an empty slice when input is nil or len(r) does not equal Point.Dimensions().
-func (t *KDTree) RangeSearch(r kdrange.Range) []Point {
+func (t *KDTree) RangeSearch(r kdrangeRange) []Point {
 	if t.root == nil || r == nil || len(r) != t.root.Dimensions() {
 		return []Point{}
 	}
@@ -168,7 +171,7 @@ func knn(p Point, k int, start *node, currentAxis int, nearestPQ *pq.PriorityQue
 	// 2. move up
 	currentAxis = (currentAxis - 1 + p.Dimensions()) % p.Dimensions()
 	for path, currentNode = popLast(path); currentNode != nil; path, currentNode = popLast(path) {
-		currentDistance := distance(p, currentNode)
+		currentDistance := p.Distance(currentNode.Point)
 		checkedDistance := getKthOrLastDistance(nearestPQ, k-1)
 		if currentDistance < checkedDistance {
 			nearestPQ.Insert(currentNode, currentDistance)
@@ -176,7 +179,7 @@ func knn(p Point, k int, start *node, currentAxis int, nearestPQ *pq.PriorityQue
 		}
 
 		// check other side of plane
-		if planeDistance(p, currentNode.Dimension(currentAxis), currentAxis) < checkedDistance {
+		if p.PlaneDistance(currentNode.Dimension(currentAxis), currentAxis) < checkedDistance {
 			var next *node
 			if p.Dimension(currentAxis) < currentNode.Dimension(currentAxis) {
 				next = currentNode.Right
@@ -187,18 +190,6 @@ func knn(p Point, k int, start *node, currentAxis int, nearestPQ *pq.PriorityQue
 		}
 		currentAxis = (currentAxis - 1 + p.Dimensions()) % p.Dimensions()
 	}
-}
-
-func distance(p1, p2 Point) float64 {
-	sum := 0.
-	for i := 0; i < p1.Dimensions(); i++ {
-		sum += math.Pow(p1.Dimension(i)-p2.Dimension(i), 2.0)
-	}
-	return math.Sqrt(sum)
-}
-
-func planeDistance(p Point, planePosition float64, dim int) float64 {
-	return math.Abs(planePosition - p.Dimension(dim))
 }
 
 func popLast(arr []*node) ([]*node, *node) {
@@ -368,7 +359,7 @@ func (n *node) FindLargest(axis int, largest *node) *node {
 	return largest
 }
 
-func (n *node) RangeSearch(r kdrange.Range, axis int) []Point {
+func (n *node) RangeSearch(r kdrangeRange, axis int) []Point {
 	points := []Point{}
 
 	for dim, limit := range r {
