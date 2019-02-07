@@ -16,7 +16,12 @@
 
 package points
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+
+	kdtree "github.com/kyroy/kdtree"
+)
 
 // Point2D ...
 type Point2D struct {
@@ -40,4 +45,18 @@ func (p *Point2D) Dimension(i int) float64 {
 // String ...
 func (p *Point2D) String() string {
 	return fmt.Sprintf("{%.2f %.2f}", p.X, p.Y)
+}
+
+// Distance implements *Point Distance for Point2D
+func (p *Point2D) Distance(p2 kdtree.Point) float64 {
+	sum := 0.
+	for i := 0; i < p.Dimensions(); i++ {
+		sum += math.Pow(p.Dimension(i)-p2.Dimension(i), 2.0)
+	}
+	return math.Sqrt(sum)
+}
+
+// PlaneDistance implements PlaneDistance for Point2D
+func (p *Point2D) PlaneDistance(planePosition float64, dim int) float64 {
+	return math.Abs(planePosition - p.Dimension(dim))
 }

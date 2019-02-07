@@ -17,7 +17,12 @@
 // Package points contains multiple example implementations of the kdtree.Point interface.
 package points
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+
+	kdtree "github.com/kyroy/kdtree"
+)
 
 // Point represents a n-dimensional point of the k-d tree.
 type Point struct {
@@ -46,4 +51,18 @@ func (p *Point) Dimension(i int) float64 {
 // String returns the string representation of the point.
 func (p *Point) String() string {
 	return fmt.Sprintf("{%v %v}", p.Coordinates, p.Data)
+}
+
+// Distance implements Distance for points.Point
+func (p1 *Point) Distance(p2 kdtree.Point) float64 {
+	sum := 0.
+	for i := 0; i < p1.Dimensions(); i++ {
+		sum += math.Pow(p1.Dimension(i)-p2.Dimension(i), 2.0)
+	}
+	return math.Sqrt(sum)
+}
+
+// PlaneDistance implements PlaneDistance for points.Point
+func (p *Point) PlaneDistance(planePosition float64, dim int) float64 {
+	return math.Abs(planePosition - p.Dimension(dim))
 }

@@ -17,13 +17,12 @@
 package kdtree_test
 
 import (
-	"math"
 	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/jupp0r/go-priority-queue"
-	"github.com/kyroy/kdtree"
+	kdtree "github.com/kyroy/kdtree"
 	"github.com/kyroy/kdtree/kdrange"
 	. "github.com/kyroy/kdtree/points"
 	"github.com/stretchr/testify/assert"
@@ -567,7 +566,7 @@ func prioQueueKNN(points []kdtree.Point, p kdtree.Point, k int) []kdtree.Point {
 
 	nnPQ := pq.New()
 	for _, point := range points {
-		nnPQ.Insert(point, distance(p, point))
+		nnPQ.Insert(point, p.Distance(point))
 	}
 
 	for i := 0; i < k; i++ {
@@ -594,14 +593,6 @@ pointLoop:
 	}
 
 	return result
-}
-
-func distance(p1, p2 kdtree.Point) float64 {
-	sum := 0.
-	for i := 0; i < p1.Dimensions(); i++ {
-		sum += math.Pow(p1.Dimension(i)-p2.Dimension(i), 2.0)
-	}
-	return math.Sqrt(sum)
 }
 
 func assertPointsEqual(t *testing.T, p1 kdtree.Point, p2 kdtree.Point) {
