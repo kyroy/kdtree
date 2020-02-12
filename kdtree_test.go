@@ -559,6 +559,20 @@ func generateTestCaseData(size int) []kdtree.Point {
 	return points
 }
 
+func generateNdTestCaseData(size, dimensions int) []kdtree.Point {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var points []kdtree.Point
+	for i := 0; i < size; i++ {
+		values := make([]float64, dimensions)
+		for j := range values {
+			values[j] = r.Float64()*3000 - 1500
+		}
+		points = append(points, NewPoint(values, nil))
+	}
+
+	return points
+}
+
 func prioQueueKNN(points []kdtree.Point, p kdtree.Point, k int) []kdtree.Point {
 	knn := make([]kdtree.Point, 0, k)
 	if p == nil {
@@ -608,5 +622,79 @@ func assertPointsEqual(t *testing.T, p1 kdtree.Point, p2 kdtree.Point) {
 	assert.Equal(t, p1.Dimensions(), p2.Dimensions())
 	for i := 0; i < p1.Dimensions(); i++ {
 		assert.Equal(t, p1.Dimension(i), p2.Dimension(i))
+	}
+}
+
+// TestKDTree_RemoveAxisInversion is a targeted test for a Remove bug
+//
+// Remove wasn't correctly taking into account the axis when searching for
+// replacements/substitutes. This caused an incorrect result when removing the
+// root node from this tree.
+//
+// This is because the {171, 176} node starts on the 'left' branch of the
+// {238, 155} node, which is correct if indexed by the X axis. When the root
+// node is removed, {238, 155} instead becomes indexed on the Y axis, but
+// {171, 176} was being left on the 'left' branch.
+//
+// This test verifies the fix and should help prevent regressions
+func TestKDTree_RemoveAxisInversion(t *testing.T) {
+	tree := kdtree.New([]kdtree.Point{
+		NewPoint([]float64{171, 176}, nil),
+		NewPoint([]float64{238, 155}, nil),
+		NewPoint([]float64{257, 246}, nil),
+		NewPoint([]float64{181, 265}, nil),
+		NewPoint([]float64{206, 282}, nil),
+		NewPoint([]float64{265, 176}, nil),
+		NewPoint([]float64{284, 209}, nil),
+		NewPoint([]float64{296, 168}, nil),
+		NewPoint([]float64{280, 225}, nil),
+		NewPoint([]float64{288, 283}, nil),
+		NewPoint([]float64{289, 292}, nil),
+	});
+
+	search := NewPoint([]float64{150, 218}, nil)
+	remove := NewPoint([]float64{265, 176}, nil)
+
+	tree.Remove(remove)
+
+	fewNN := tree.KNN(search, 1)
+	manyNN := tree.KNN(search, 10)
+
+	assert.Equal(t, distance(search, manyNN[0]), distance(search, fewNN[0]))
+}
+
+func TestKDTree_RemoveAxisInversionGenerator(t *testing.T) {
+	for dims := 2; dims <= 4; dims++ {
+		maxSize := int(math.Pow(float64(dims), 4))
+		many := maxSize
+		few := 1
+
+		tree := kdtree.New([]kdtree.Point{})
+		arr := make([]kdtree.Point, 0, maxSize)
+		for i := 0; i < 1000; i++ {
+			p := generateNdTestCaseData(1, dims)[0]
+
+			// Two KNN queries
+			fewNN := tree.KNN(p, few)
+			manyNN := tree.KNN(p, many)
+
+			// Check if the nearest is the same
+			if len(fewNN) > 0 && !assert.Equal(t, distance(p, manyNN[0]), distance(p, fewNN[0])) {
+				break
+			}
+
+			// Add in the new point
+			arr = append(arr, p)
+			tree.Insert(p)
+
+			// Limit the max number of elements - which will also
+			// introduce some churn in the tree
+			if len(arr) > maxSize {
+				idx := rand.Intn(len(arr))
+				tree.Remove(arr[idx])
+				arr[idx] = arr[len(arr)-1]
+				arr = arr[:len(arr)-1]
+			}
+		}
 	}
 }
