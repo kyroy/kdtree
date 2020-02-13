@@ -497,6 +497,78 @@ func TestKDTree_RangeSearchWithGenerator(t *testing.T) {
 	}
 }
 
+// TestKDTree_RemoveAxisInversion is a targeted test for issue #6.
+//
+// https://github.com/kyroy/kdtree/issues/6
+//
+// Remove wasn't correctly taking into account the axis when searching for
+// replacements/substitutes. This caused an incorrect result when removing the
+// root node from this tree.
+//
+// This is because the {171, 176} node starts on the 'left' branch of the
+// {238, 155} node, which is correct if indexed by the X axis. When the root
+// node is removed, {238, 155} instead becomes indexed on the Y axis, but
+// {171, 176} was being left on the 'left' branch.
+//
+// This test verifies the fix and should help prevent regressions
+func TestKDTree_RemoveAxisInversion(t *testing.T) {
+	tree := kdtree.New([]kdtree.Point{
+		&Point2D{X: 171, Y: 176},
+		&Point2D{X: 238, Y: 155},
+		&Point2D{X: 257, Y: 246},
+		&Point2D{X: 181, Y: 265},
+		&Point2D{X: 206, Y: 282},
+		&Point2D{X: 265, Y: 176},
+		&Point2D{X: 284, Y: 209},
+		&Point2D{X: 296, Y: 168},
+		&Point2D{X: 280, Y: 225},
+		&Point2D{X: 288, Y: 283},
+		&Point2D{X: 289, Y: 292},
+	})
+	search := &Point2D{X: 150, Y: 218}
+	remove := &Point2D{X: 265, Y: 176}
+
+	tree.Remove(remove)
+
+	fewNN := tree.KNN(search, 1)
+	manyNN := tree.KNN(search, 10)
+
+	assertPointsEqual(t, fewNN[0], manyNN[0])
+}
+
+func TestKDTree_RemoveAxisInversionGenerator(t *testing.T) {
+	for dims := 2; dims <= 4; dims++ {
+		maxSize := int(math.Pow(float64(dims), 4))
+
+		tree := kdtree.New(nil)
+		arr := make([]kdtree.Point, 0, maxSize+1)
+		for i := 0; i < 1000; i++ {
+			p := generateTestPoint(dims)
+
+			// Two KNN queries
+			fewNN := tree.KNN(p, 1)
+			manyNN := tree.KNN(p, maxSize)
+
+			if len(arr) > 0 {
+				assertPointsEqual(t, fewNN[0], manyNN[0])
+			}
+
+			// Add in the new point
+			arr = append(arr, p)
+			tree.Insert(p)
+
+			// Limit the max number of elements - which will also
+			// introduce some churn in the tree
+			if len(arr) > maxSize {
+				idx := rand.Intn(len(arr))
+				tree.Remove(arr[idx])
+				arr[idx] = arr[len(arr)-1]
+				arr = arr[:len(arr)-1]
+			}
+		}
+	}
+}
+
 // benchmarks
 
 var resultTree *kdtree.KDTree
@@ -559,6 +631,15 @@ func generateTestCaseData(size int) []kdtree.Point {
 	return points
 }
 
+func generateTestPoint(dimensions int) kdtree.Point {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	values := make([]float64, dimensions)
+	for j := range values {
+		values[j] = r.Float64()*3000 - 1500
+	}
+	return NewPoint(values, nil)
+}
+
 func prioQueueKNN(points []kdtree.Point, p kdtree.Point, k int) []kdtree.Point {
 	knn := make([]kdtree.Point, 0, k)
 	if p == nil {
@@ -607,6 +688,6 @@ func distance(p1, p2 kdtree.Point) float64 {
 func assertPointsEqual(t *testing.T, p1 kdtree.Point, p2 kdtree.Point) {
 	assert.Equal(t, p1.Dimensions(), p2.Dimensions())
 	for i := 0; i < p1.Dimensions(); i++ {
-		assert.Equal(t, p1.Dimension(i), p2.Dimension(i))
+		assert.Equal(t, p1.Dimension(i), p2.Dimension(i), "assert equal dimension %d", i)
 	}
 }

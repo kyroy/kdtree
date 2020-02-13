@@ -316,7 +316,7 @@ func (n *node) Remove(p Point, axis int) (*node, *node) {
 
 	if n.Left != nil {
 		largest := n.Left.FindLargest(axis, nil)
-		removed, sub := n.Left.Remove(largest, axis)
+		removed, sub := n.Left.Remove(largest, (axis+1)%n.Dimensions())
 
 		removed.Left = n.Left
 		removed.Right = n.Right
@@ -328,7 +328,7 @@ func (n *node) Remove(p Point, axis int) (*node, *node) {
 
 	if n.Right != nil {
 		smallest := n.Right.FindSmallest(axis, nil)
-		removed, sub := n.Right.Remove(smallest, axis)
+		removed, sub := n.Right.Remove(smallest, (axis+1)%n.Dimensions())
 
 		removed.Left = n.Left
 		removed.Right = n.Right
