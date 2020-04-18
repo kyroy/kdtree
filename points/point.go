@@ -47,3 +47,7 @@ func (p *Point) Dimension(i int) float64 {
 func (p *Point) String() string {
 	return fmt.Sprintf("{%v %v}", p.Coordinates, p.Data)
 }
+
+func (p *Point) GetData() interface{} {
+	return p.Data
+}
