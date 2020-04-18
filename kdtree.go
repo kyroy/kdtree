@@ -32,7 +32,7 @@ type Point interface {
 	Dimensions() int
 	// Dimension returns the value of the i-th dimension.
 	Dimension(i int) float64
-	GetData() interface{}
+	GetData() string
 }
 
 // KDTree represents the k-d tree.
