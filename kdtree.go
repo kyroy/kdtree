@@ -22,8 +22,8 @@ import (
 	"math"
 	"sort"
 
-	"./kdrange"
-	"./priority-queue"
+	"kdtree/kdrange"
+	"kdtree/priority-queue"
 )
 
 // Point specifies one element of the k-d tree.
