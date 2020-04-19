@@ -19,11 +19,11 @@ package kdtree
 
 import (
 	"fmt"
+	"github.com/kyroy/priority-queue"
+	"github.com/mkadirtan/kdtree/kdrange"
+	"github.com/mkadirtan/kdtree/priority-queue"
 	"math"
 	"sort"
-
-	"kdtree/kdrange"
-	"kdtree/priority-queue"
 )
 
 // Point specifies one element of the k-d tree.
