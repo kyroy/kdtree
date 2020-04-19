@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Dennis Kuhnert
+ * Copyright 2020 Dennis Kuhnert
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,16 +17,15 @@
 package kdtree_test
 
 import (
-	"math"
-	"math/rand"
-	"testing"
-	"time"
-
 	"github.com/jupp0r/go-priority-queue"
 	"github.com/kyroy/kdtree"
 	"github.com/kyroy/kdtree/kdrange"
 	. "github.com/kyroy/kdtree/points"
 	"github.com/stretchr/testify/assert"
+	"math"
+	"math/rand"
+	"testing"
+	"time"
 )
 
 func TestNew(t *testing.T) {
