@@ -22,8 +22,8 @@ import (
 	"math"
 	"sort"
 
-	"github.com/kyroy/kdtree/kdrange"
-	"github.com/kyroy/priority-queue"
+	"./kdrange"
+	"./priority-queue"
 )
 
 // Point specifies one element of the k-d tree.
