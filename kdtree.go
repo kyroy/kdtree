@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"github.com/kyroy/priority-queue"
 	"github.com/mkadirtan/kdtree/kdrange"
-	"github.com/mkadirtan/kdtree/priority-queue"
 	"math"
 	"sort"
 )
