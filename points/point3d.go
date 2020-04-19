@@ -23,6 +23,7 @@ type Point3D struct {
 	X float64
 	Y float64
 	Z float64
+	Data string
 }
 
 // Dimensions ...
@@ -45,4 +46,8 @@ func (p *Point3D) Dimension(i int) float64 {
 // String ...
 func (p *Point3D) String() string {
 	return fmt.Sprintf("{%.2f %.2f %.2f}", p.X, p.Y, p.Z)
+}
+
+func (p *Point3D) GetData() string {
+	return p.Data
 }

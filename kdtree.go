@@ -19,11 +19,10 @@ package kdtree
 
 import (
 	"fmt"
+	"github.com/kyroy/priority-queue"
+	"github.com/mkadirtan/kdtree/kdrange"
 	"math"
 	"sort"
-
-	"github.com/kyroy/kdtree/kdrange"
-	"github.com/kyroy/priority-queue"
 )
 
 // Point specifies one element of the k-d tree.
@@ -32,6 +31,7 @@ type Point interface {
 	Dimensions() int
 	// Dimension returns the value of the i-th dimension.
 	Dimension(i int) float64
+	GetData() string
 }
 
 // KDTree represents the k-d tree.
