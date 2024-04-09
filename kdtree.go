@@ -387,3 +387,54 @@ checkChildren:
 
 	return points
 }
+
+// QueryBallPoint returns all points within distance r from a given point x in the KDTree.
+func (t *KDTree) QueryBallPoint(x Point, r float64) []Point {
+	var results []Point
+	if t.root == nil {
+		return results
+	}
+	t.root.queryBallPoint(x, 0, r*r, &results)
+	return results
+}
+
+func (n *node) queryBallPoint(target Point, axis int, rSquared float64, results *[]Point) {
+	if n == nil {
+		return
+	}
+
+	// Check if the current node is within the spherical region with radius r around the target point
+	distSquared := 0.0
+	for i := 0; i < target.Dimensions(); i++ {
+		diff := n.Point.Dimension(i) - target.Dimension(i)
+		distSquared += diff * diff
+	}
+	if distSquared <= rSquared {
+		*results = append(*results, n.Point)
+	}
+
+	// Calculate the difference between the target point and the node in the current dimension to determine the search direction
+	diff := target.Dimension(axis) - n.Point.Dimension(axis)
+
+	// The next dimension to search
+	nextAxis := (axis + 1) % target.Dimensions()
+
+	// First search the subtree that is closer to the target point
+	if diff < 0 {
+		n.Left.queryBallPoint(target, nextAxis, rSquared, results)
+	} else {
+		n.Right.queryBallPoint(target, nextAxis, rSquared, results)
+	}
+
+	// If the distance from the target point to the dividing plane is less than or equal to r, also search the other side of the subtree
+	if diff*diff <= rSquared {
+		// Pruning: If the minimum distance from the current node to the target point is greater than r, do not search that subtree
+		if distSquared <= rSquared {
+			if diff < 0 {
+				n.Right.queryBallPoint(target, nextAxis, rSquared, results)
+			} else {
+				n.Left.queryBallPoint(target, nextAxis, rSquared, results)
+			}
+		}
+	}
+}

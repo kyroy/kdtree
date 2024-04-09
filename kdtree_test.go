@@ -496,6 +496,47 @@ func TestKDTree_RangeSearchWithGenerator(t *testing.T) {
 	}
 }
 
+func TestKDTree_QueryBallPoint(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []kdtree.Point
+		query    kdtree.Point
+		radius   float64
+		expected []kdtree.Point
+	}{
+		{
+			name: "within radius",
+			input: []kdtree.Point{
+				&Point2D{X: 1, Y: 2},
+				&Point2D{X: 2, Y: 3},
+				&Point2D{X: 4, Y: 5},
+			},
+			query:    &Point2D{X: 1, Y: 2},
+			radius:   2.0,
+			expected: []kdtree.Point{&Point2D{X: 1, Y: 2}, &Point2D{X: 2, Y: 3}},
+		},
+		{
+			name: "empty result",
+			input: []kdtree.Point{
+				&Point2D{X: 1, Y: 2},
+				&Point2D{X: 2, Y: 3},
+				&Point2D{X: 4, Y: 5},
+			},
+			query:    &Point2D{X: 10, Y: 10},
+			radius:   5.0,
+			expected: []kdtree.Point{},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tree := kdtree.New(test.input)
+			result := tree.QueryBallPoint(test.query, test.radius)
+			assert.ElementsMatch(t, test.expected, result, "The returned points should match the expected points within the radius")
+		})
+	}
+}
+
 // TestKDTree_RemoveAxisInversion is a targeted test for issue #6.
 //
 // https://github.com/kyroy/kdtree/issues/6

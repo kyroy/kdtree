@@ -64,6 +64,10 @@ func main() {
 	// RangeSearch
 	fmt.Println(tree.RangeSearch(kdrange.New(1, 8, 0, 2)))
 	// [{5.00 0.00} {3.00 1.00}]
+	
+	// QueryBallPoint 
+	fmt.Println(tree.QueryBallPoint(&points.Point2D{X: 3, Y: 1}, 2.5)) 
+	// Output: Points within radius: [{3.00 1.00} {5.00 0.00}]
     
 	// Points
 	fmt.Println(tree.Points())
@@ -108,7 +112,11 @@ func main() {
     // RangeSearch
     fmt.Println(tree.RangeSearch(kdrange.New(1, 15, 1, 5, 0, 5)))
     // [{[7 2 3] {first}} {[8 1 0] {fifth}}]
-    
+	
+    // QueryBallPoint
+    fmt.Println(tree.QueryBallPoint(points.NewPoint([]float64{1, 1, 1}, nil), 5.0))
+    // [{[4 6 1] {third}} {[7 2 3] {first}}]
+	
     // Points
     fmt.Println(tree.Points())
     // [{[3 7 10] {second}} {[4 6 1] {third}} {[8 1 0] {fifth}} {[7 2 3] {first}} {[12 4 6] {fourth}}]
